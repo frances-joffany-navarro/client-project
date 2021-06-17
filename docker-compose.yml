@@ -27,7 +27,7 @@ services:
      ports:
        - "8000:80"
      volumes:
-       - ./wp-content:/var/www/html/wp-content
+       - .:/var/www/html/wp-content
      restart: always
      environment:
        WORDPRESS_DB_HOST: db:3306
