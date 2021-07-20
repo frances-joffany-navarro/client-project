@@ -1,4 +1,4 @@
-<input type="range" readonly
+<input type="range" disabled
 	class="wpforms-number-slider"
 	id="wpforms-number-slider-<?php echo (int) $field_id; ?>"
 	value="<?php echo (float) $default_value; ?>"

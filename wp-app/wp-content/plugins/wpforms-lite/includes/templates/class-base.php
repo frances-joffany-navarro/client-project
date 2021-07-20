@@ -11,7 +11,6 @@ abstract class WPForms_Template {
 	 * Full name of the template, eg "Contact Form".
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var string
 	 */
 	public $name;
@@ -20,34 +19,14 @@ abstract class WPForms_Template {
 	 * Slug of the template, eg "contact-form" - no spaces.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var string
 	 */
 	public $slug;
 
 	/**
-	 * Source of the template.
-	 *
-	 * @since 1.6.8
-	 *
-	 * @var array
-	 */
-	public $source;
-
-	/**
-	 * Categories array.
-	 *
-	 * @since 1.6.8
-	 *
-	 * @var array
-	 */
-	public $categories;
-
-	/**
 	 * Short description the template.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var string
 	 */
 	public $description = '';
@@ -56,7 +35,6 @@ abstract class WPForms_Template {
 	 * Short description of the fields included with the template.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var string
 	 */
 	public $includes = '';
@@ -65,7 +43,6 @@ abstract class WPForms_Template {
 	 * URL of the icon to display in the admin area.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var string
 	 */
 	public $icon = '';
@@ -74,7 +51,6 @@ abstract class WPForms_Template {
 	 * Array of data that is assigned to the post_content on form creation.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var array
 	 */
 	public $data;
@@ -83,7 +59,6 @@ abstract class WPForms_Template {
 	 * Priority to show in the list of available templates.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var int
 	 */
 	public $priority = 20;
@@ -92,7 +67,6 @@ abstract class WPForms_Template {
 	 * Core or additional template.
 	 *
 	 * @since 1.4.0
-	 *
 	 * @var bool
 	 */
 	public $core = false;
@@ -101,7 +75,6 @@ abstract class WPForms_Template {
 	 * Modal message to display when the template is applied.
 	 *
 	 * @since 1.0.0
-	 *
 	 * @var array
 	 */
 	public $modal = '';
@@ -118,10 +91,10 @@ abstract class WPForms_Template {
 
 		$type = $this->core ? '_core' : '';
 
-		add_filter( "wpforms_form_templates{$type}", [ $this, 'template_details' ], $this->priority );
-		add_filter( 'wpforms_create_form_args', [ $this, 'template_data' ], 10, 2 );
-		add_filter( 'wpforms_save_form_args', [ $this, 'template_replace' ], 10, 3 );
-		add_filter( 'wpforms_builder_template_active', [ $this, 'template_active' ], 10, 2 );
+		add_filter( "wpforms_form_templates{$type}", array( $this, 'template_details' ), $this->priority );
+		add_filter( 'wpforms_create_form_args', array( $this, 'template_data' ), 10, 2 );
+		add_filter( 'wpforms_save_form_args', array( $this, 'template_replace' ), 10, 3 );
+		add_filter( 'wpforms_builder_template_active', array( $this, 'template_active' ), 10, 2 );
 	}
 
 	/**
@@ -129,28 +102,27 @@ abstract class WPForms_Template {
 	 *
 	 * @since 1.0.0
 	 */
-	public function init() {}
+	public function init() {
+	}
 
 	/**
 	 * Add basic template details to the Add New Form admin screen.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $templates Templates array.
+	 * @param array $templates
 	 *
 	 * @return array
 	 */
 	public function template_details( $templates ) {
 
-		$templates[] = [
+		$templates[] = array(
 			'name'        => $this->name,
 			'slug'        => $this->slug,
-			'source'      => $this->source,
-			'categories'  => $this->categories,
 			'description' => $this->description,
 			'includes'    => $this->includes,
 			'icon'        => $this->icon,
-		];
+		);
 
 		return $templates;
 	}
@@ -160,8 +132,8 @@ abstract class WPForms_Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $args Create form arguments.
-	 * @param array $data Template data.
+	 * @param array $args
+	 * @param array $data
 	 *
 	 * @return array
 	 */
@@ -181,9 +153,9 @@ abstract class WPForms_Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $form Form post data.
-	 * @param array $data Form data.
-	 * @param array $args Update form arguments.
+	 * @param array $form
+	 * @param array $data
+	 * @param array $args
 	 *
 	 * @return array
 	 */
@@ -192,7 +164,7 @@ abstract class WPForms_Template {
 		if ( ! empty( $args['template'] ) ) {
 			if ( $args['template'] === $this->slug ) {
 				$new                  = $this->data;
-				$new['settings']      = ! empty( $form['post_content']['settings'] ) ? $form['post_content']['settings'] : [];
+				$new['settings']      = ! empty( $form['post_content']['settings'] ) ? $form['post_content']['settings'] : array();
 				$form['post_content'] = wpforms_encode( $new );
 			}
 		}
@@ -205,10 +177,10 @@ abstract class WPForms_Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array  $details Details.
-	 * @param object $form    Form data.
+	 * @param array $details
+	 * @param object $form
 	 *
-	 * @return array|void
+	 * @return array
 	 */
 	public function template_active( $details, $form ) {
 
@@ -224,7 +196,7 @@ abstract class WPForms_Template {
 			$display = $this->template_modal_conditional( $form_data );
 		}
 
-		return [
+		$template = array(
 			'name'          => $this->name,
 			'slug'          => $this->slug,
 			'description'   => $this->description,
@@ -232,7 +204,9 @@ abstract class WPForms_Template {
 			'icon'          => $this->icon,
 			'modal'         => $this->modal,
 			'modal_display' => $display,
-		];
+		);
+
+		return $template;
 	}
 
 	/**

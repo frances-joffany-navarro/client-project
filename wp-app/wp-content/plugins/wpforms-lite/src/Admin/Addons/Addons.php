@@ -37,7 +37,7 @@ class Addons {
 	private $available_addons;
 
 	/**
-	 * Determine if the class is allowed to load.
+	 * Indicate if current Education feature is allowed to load.
 	 *
 	 * @since 1.6.6
 	 *
@@ -60,7 +60,7 @@ class Addons {
 			return;
 		}
 
-		$this->cache  = wpforms()->get( 'addons_cache' );
+		$this->cache  = new AddonsCache();
 		$this->addons = $this->cache->get_cached();
 
 		$this->hooks();
@@ -166,34 +166,6 @@ class Addons {
 	}
 
 	/**
-	 * Get available addons data by slugs.
-	 *
-	 * @since 1.6.8
-	 *
-	 * @param array $slugs Addon slugs.
-	 *
-	 * @return array
-	 */
-	public function get_by_slugs( $slugs ) {
-
-		if ( empty( $slugs ) || ! is_array( $slugs ) ) {
-			return [];
-		}
-
-		$result_addons = [];
-
-		foreach ( $slugs as $slug ) {
-			$addon = $this->get_addon( $slug );
-
-			if ( ! empty( $addon ) ) {
-				$result_addons[] = $addon;
-			}
-		}
-
-		return $result_addons;
-	}
-
-	/**
 	 * Get available addon data by slug.
 	 *
 	 * @since 1.6.6
@@ -204,7 +176,7 @@ class Addons {
 	 */
 	public function get_addon( $slug ) {
 
-		$slug = 'wpforms-' . str_replace( 'wpforms-', '', sanitize_key( $slug ) );
+		$slug = 'wpforms-' . str_replace( 'wpforms-', '', $slug );
 
 		$addon = ! empty( $this->available_addons[ $slug ] ) ? $this->available_addons[ $slug ] : [];
 

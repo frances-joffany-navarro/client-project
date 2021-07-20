@@ -1,4 +1,4 @@
-/* global WPForms, WPFormsBuilder, wpforms_challenge_admin, WPFormsFormEmbedWizard */
+/* global WPFormsBuilder, wpforms_challenge_admin, WPFormsFormEmbedWizard */
 /**
  * WPForms Challenge function.
  *
@@ -81,7 +81,7 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 
 			var tooltipAnchors = [
 				'#wpforms-setup-name',
-				'.wpforms-setup-title .wpforms-setup-title-after',
+				'.wpforms-setup-title.core',
 				'#add-fields a i',
 				'#wpforms-builder-settings-notifications-title',
 			];
@@ -109,9 +109,10 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 
 			$( '#wpforms-builder' )
 
-				// Register select template event when the setup panel is ready.
-				.on( 'wpformsBuilderSetupReady', function() {
-					app.eventSelectTemplate();
+				// Step 2 - Select the Form template.
+				.off( 'click', '.wpforms-template-select' ) // Intercept Form Builder's form template selection and apply own logic.
+				.on( 'click', '.wpforms-template-select', function( e ) {
+					app.builderTemplateSelect( this, e );
 				} )
 
 				// Restore tooltips when switching builder panels/sections.
@@ -128,24 +129,8 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 			// Step 4 - Notifications.
 			$( document ).on( 'click', '.wpforms-challenge-step4-done', app.showEmbedPopup );
 
-			// Tooltipster ready.
+			// Tooltepister ready.
 			$.tooltipster.on( 'ready', app.tooltipsterReady );
-		},
-
-		/**
-		 * Register select template event.
-		 *
-		 * @since 1.6.8
-		 */
-		eventSelectTemplate: function() {
-
-			$( '#wpforms-panel-setup' )
-
-				// Step 2 - Select the Form template.
-				.off( 'click', '.wpforms-template-select' ) // Intercept Form Builder's form template selection and apply own logic.
-				.on( 'click', '.wpforms-template-select', function( e ) {
-					app.builderTemplateSelect( this, e );
-				} );
 		},
 
 		/**
@@ -214,11 +199,11 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 
 			if ( step <= 1 ) {
 				WPFormsChallenge.core.stepCompleted( 2 )
-					.done( WPForms.Admin.Builder.Setup.selectTemplate.bind( null, e ) );
+					.done( WPFormsBuilder.templateSelect.bind( null, el, e ) );
 				return;
 			}
 
-			WPForms.Admin.Builder.Setup.selectTemplate.bind( null, e );
+			WPFormsBuilder.templateSelect( el, e );
 		},
 
 		/**

@@ -331,20 +331,20 @@ add_action( 'admin_print_scripts', 'wpforms_admin_hide_unrelated_notices' );
  *
  * @since 1.3.9
  *
- * @param string $medium  URL parameter: utm_medium.
- * @param string $content URL parameter: utm_content.
+ * @param string $medium  utm_medium URL parameter.
+ * @param string $content utm_content URL parameter.
  *
  * @return string.
  */
 function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
 
 	$upgrade = add_query_arg(
-		[
+		array(
 			'discount'     => 'LITEUPGRADE',
 			'utm_source'   => 'WordPress',
 			'utm_campaign' => 'liteplugin',
 			'utm_medium'   => apply_filters( 'wpforms_upgrade_link_medium', $medium ),
-		],
+		),
 		'https://wpforms.com/lite-upgrade/'
 	);
 
@@ -363,7 +363,7 @@ function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
  */
 function wpforms_check_php_version() {
 
-	// Display for PHP below 5.6.
+	// Display for PHP below 5.6
 	if ( version_compare( PHP_VERSION, '5.5', '>=' ) ) {
 		return;
 	}
@@ -382,15 +382,16 @@ function wpforms_check_php_version() {
 	\WPForms\Admin\Notice::error(
 		'<p>' .
 		sprintf(
-			wp_kses( /* translators: %1$s - WPForms plugin name; %2$s - WPForms.com URL to a related doc. */
+			wp_kses(
+				/* translators: %1$s - WPForms plugin name; %2$s - WPForms.com URL to a related doc. */
 				__( 'Your site is running an outdated version of PHP that is no longer supported and may cause issues with %1$s. <a href="%2$s" target="_blank" rel="noopener noreferrer">Read more</a> for additional information.', 'wpforms-lite' ),
-				[
-					'a' => [
-						'href'   => [],
-						'target' => [],
-						'rel'    => [],
-					],
-				]
+				array(
+					'a' => array(
+						'href'   => array(),
+						'target' => array(),
+						'rel'    => array(),
+					),
+				)
 			),
 			'<strong>WPForms</strong>',
 			'https://wpforms.com/docs/supported-php-version/'
@@ -398,10 +399,10 @@ function wpforms_check_php_version() {
 		'<br><br><em>' .
 		wp_kses(
 			__( '<strong>Please Note:</strong> Support for PHP 5.5 will be discontinued in 2020. After this, if no further action is taken, WPForms functionality will be disabled.', 'wpforms-lite' ),
-			[
-				'strong' => [],
-				'em'     => [],
-			]
+			array(
+				'strong' => array(),
+				'em'     => array(),
+			)
 		) .
 		'</em></p>'
 	);

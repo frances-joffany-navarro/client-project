@@ -53,7 +53,6 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 
 			add_action( 'wpforms_admin_notice_dismiss_ajax', [ $this, 'connect_dismiss' ] );
 			add_action( 'wpforms_admin_page', [ $this, 'learn_more_page' ] );
-			add_filter( "wpforms_providers_provider_settings_formbuilder_display_content_default_screen_{$this->slug}", [ $this, 'builder_settings_default_content' ] );
 
 			// Provide option to override sign up link.
 			$sign_up = get_option( 'wpforms_constant_contact_signup', false );
@@ -522,48 +521,64 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 	 *
 	 * @since 1.3.6
 	 *
-	 * @param string $connection_id Connection Id.
-	 * @param array  $connection    Connection data.
+	 * @param string $connection_id
+	 * @param array $connection
 	 *
 	 * @return string
 	 */
-	public function output_groups( $connection_id = '', $connection = [] ) {
-
+	public function output_groups( $connection_id = '', $connection = array() ) {
 		// No groups or segments for this provider.
 		return '';
 	}
 
 	/**
-	 * Default content for the provider settings panel in the form builder.
+	 * Output content after the main builder output.
 	 *
-	 * @since 1.6.8
-	 *
-	 * @param string $content Default content.
-	 *
-	 * @return string
+	 * @since 1.3.6
 	 */
-	public function builder_settings_default_content( $content ) {
+	public function builder_output_after() {
 
-		ob_start();
+		// Only display if Constant Contact account has not been setup.
+		$providers = wpforms_get_providers_options();
+
+		if ( ! empty( $providers[ $this->slug ] ) ) {
+			return;
+		}
 		?>
-		<p>
-			<a href="<?php echo esc_url( $this->sign_up ); ?>" class="wpforms-btn wpforms-btn-md wpforms-btn-orange" target="_blank" rel="noopener noreferrer">
-				<?php esc_html_e( 'Try Constant Contact for Free', 'wpforms-lite' ); ?>
-			</a>
-		</p>
-		<p>
-			<?php
-			printf(
-				'<a href="%s" target="_blank" rel="noopener noreferrer" class="secondary-text">' .
-					esc_html__( 'Learn more about the power of email marketing.', 'wpforms-lite' ) .
-				'</a>',
-				esc_url( admin_url( 'admin.php?page=wpforms-page&wpforms-page=constant-contact' ) )
-			);
-			?>
-		</p>
+		<div class="wpforms-alert wpforms-alert-info">
+			<p>
+				<?php
+				echo wp_kses(
+					__( 'Get the most out of <strong>WPForms</strong> &mdash; use it with an active Constant Contact account.', 'wpforms-lite' ),
+					array(
+						'strong' => array(),
+					)
+				);
+				?>
+			</p>
+			<p>
+				<a href="<?php echo esc_url( $this->sign_up ); ?>" style="margin-right: 10px;" class="button-primary" target="_blank" rel="noopener noreferrer">
+					<?php esc_html_e( 'Try Constant Contact for Free', 'wpforms-lite' ); ?>
+				</a>
+				<?php
+				printf(
+					wp_kses(
+						/* translators: %s - WPForms Constant Contact internal URL. */
+						__( 'Learn More about the <a href="%s" target="_blank" rel="noopener noreferrer">power of email marketing</a>', 'wpforms-lite' ),
+						array(
+							'a' => array(
+								'href'   => array(),
+								'target' => array(),
+								'rel'    => array(),
+							),
+						)
+					),
+					esc_url( admin_url( 'admin.php?page=wpforms-page&wpforms-page=constant-contact' ) )
+				);
+				?>
+			</p>
+		</div>
 		<?php
-
-		return $content . ob_get_clean();
 	}
 
 	/*************************************************************************

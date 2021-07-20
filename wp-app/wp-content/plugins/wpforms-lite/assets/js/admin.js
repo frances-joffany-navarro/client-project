@@ -716,19 +716,15 @@
 						.append( '<tr class="new-entries-notification"><td colspan="' + columnCount + '"><a href=""></a></td></tr>' );
 				}
 
-				var $link = $entriesList.find( '.new-entries-notification a' );
-
-				$link
+				$entriesList.find( '.new-entries-notification a' )
 					.text( data.wpforms_new_entries_notification )
 					.slideDown( {
-						start: function() {
-
-							$link.css( 'display', 'block' );
-						},
-						always: function() {
-
-							$link.css( 'display', 'block' );
-						},
+						duration: 500,
+						start   : function () {
+							$( this ).css( {
+								display: 'block'
+							} );
+						}
 					} );
 			} );
 		},

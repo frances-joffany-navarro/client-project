@@ -1,7 +1,5 @@
 <?php
 
-use \WPForms\Providers\Provider\Settings\FormBuilder;
-
 /**
  * Provider class.
  *
@@ -91,42 +89,41 @@ abstract class WPForms_Provider {
 		$this->type = esc_html__( 'Connection', 'wpforms-lite' );
 
 		$this->init();
-		$this->hooks();
+
+		// Add to list of available providers.
+		add_filter( 'wpforms_providers_available', array( $this, 'register_provider' ), $this->priority, 1 );
+
+		// Process builder AJAX requests.
+		add_action( "wp_ajax_wpforms_provider_ajax_{$this->slug}", array( $this, 'process_ajax' ) );
+
+		// Process entry.
+		add_action( 'wpforms_process_complete', array( $this, 'process_entry' ), 5, 4 );
+
+		// Fetch and store the current form data when in the builder.
+		add_action( 'wpforms_builder_init', array( $this, 'builder_form_data' ) );
+
+		// Output builder sidebar.
+		add_action( 'wpforms_providers_panel_sidebar', array( $this, 'builder_sidebar' ), $this->priority );
+
+		// Output builder content.
+		add_action( 'wpforms_providers_panel_content', array( $this, 'builder_output' ), $this->priority );
+
+		// Remove provider from Settings Integrations tab.
+		add_action( "wp_ajax_wpforms_settings_provider_disconnect_{$this->slug}", array( $this, 'integrations_tab_disconnect' ) );
+
+		// Add new provider from Settings Integrations tab.
+		add_action( "wp_ajax_wpforms_settings_provider_add_{$this->slug}", array( $this, 'integrations_tab_add' ) );
+
+		// Add providers sections to the Settings Integrations tab.
+		add_action( 'wpforms_settings_providers', array( $this, 'integrations_tab_options' ), $this->priority, 2 );
 	}
 
 	/**
-	 * Hooks.
+	 * All systems go. Used by subclasses.
 	 *
-	 * @since 1.6.8
+	 * @since 1.0.0
 	 */
-	private function hooks() {
-
-		// Add to list of available providers.
-		add_filter( 'wpforms_providers_available', [ $this, 'register_provider' ], $this->priority, 1 );
-
-		// Process builder AJAX requests.
-		add_action( "wp_ajax_wpforms_provider_ajax_{$this->slug}", [ $this, 'process_ajax' ] );
-
-		// Process entry.
-		add_action( 'wpforms_process_complete', [ $this, 'process_entry' ], 5, 4 );
-
-		// Fetch and store the current form data when in the builder.
-		add_action( 'wpforms_builder_init', [ $this, 'builder_form_data' ] );
-
-		// Output builder sidebar.
-		add_action( 'wpforms_providers_panel_sidebar', [ $this, 'builder_sidebar' ], $this->priority );
-
-		// Output builder content.
-		add_action( 'wpforms_providers_panel_content', [ $this, 'builder_output' ], $this->priority );
-
-		// Remove provider from Settings Integrations tab.
-		add_action( "wp_ajax_wpforms_settings_provider_disconnect_{$this->slug}", [ $this, 'integrations_tab_disconnect' ] );
-
-		// Add new provider from Settings Integrations tab.
-		add_action( "wp_ajax_wpforms_settings_provider_add_{$this->slug}", [ $this, 'integrations_tab_add' ] );
-
-		// Add providers sections to the Settings Integrations tab.
-		add_action( 'wpforms_settings_providers', [ $this, 'integrations_tab_options' ], $this->priority, 2 );
+	public function init() {
 	}
 
 	/**
@@ -687,7 +684,7 @@ abstract class WPForms_Provider {
 
 		$output .= sprintf( '<span>%s</span>', sanitize_text_field( $connection['connection_name'] ) );
 
-		$output .= '<button class="wpforms-provider-connection-delete"><i class="fa fa-trash-o"></i></button>';
+		$output .= '<button class="wpforms-provider-connection-delete"><i class="fa fa-times-circle"></i></button>';
 
 		$output .= sprintf( '<input type="hidden" name="providers[%s][%s][connection_name]" value="%s">', $this->slug, $connection_id, esc_attr( $connection['connection_name'] ) );
 
@@ -1030,25 +1027,15 @@ abstract class WPForms_Provider {
 	}
 
 	/**
-	 * Get provider configured status.
-	 *
-	 * @since 1.6.8
-	 */
-	private function get_configured() {
-
-		return \WPForms\Providers\Provider\Status::init( $this->slug )->is_configured()
-			? 'configured'
-			: '';
-	}
-
-	/**
 	 * Display content inside the panel sidebar area.
 	 *
 	 * @since 1.0.0
 	 */
 	public function builder_sidebar() {
 
-		$configured = $this->get_configured();
+		$form_data  = $this->form_data;
+		$configured = ! empty( $form_data['providers'][ $this->slug ] ) ? 'configured' : '';
+		$configured = apply_filters( 'wpforms_providers_' . $this->slug . '_configured', $configured );
 
 		echo '<a href="#" class="wpforms-panel-sidebar-section icon ' . esc_attr( $configured ) . ' wpforms-panel-sidebar-section-' . esc_attr( $this->slug ) . '" data-section="' . esc_attr( $this->slug ) . '">';
 
@@ -1071,9 +1058,6 @@ abstract class WPForms_Provider {
 	 * @since 1.0.0
 	 */
 	public function builder_output() {
-
-		$form_id = ! empty( $this->form_data['id'] ) ? $this->form_data['id'] : '';
-
 		?>
 		<div class="wpforms-panel-content-section wpforms-panel-content-section-<?php echo esc_attr( $this->slug ); ?>"
 			id="<?php echo esc_attr( $this->slug ); ?>-provider">
@@ -1082,9 +1066,9 @@ abstract class WPForms_Provider {
 
 			<div class="wpforms-panel-content-section-title">
 
-				<?php echo esc_html( $this->name ); ?>
+				<?php echo $this->name; ?>
 
-				<button class="wpforms-provider-connections-add" data-form_id="<?php echo absint( $form_id ); ?>"
+				<button class="wpforms-provider-connections-add" data-form_id="<?php echo absint( $_GET['form_id'] ); ?>"
 					data-provider="<?php echo esc_attr( $this->slug ); ?>"
 					data-type="<?php echo esc_attr( strtolower( $this->type ) ); ?>">
 					<?php
@@ -1096,16 +1080,7 @@ abstract class WPForms_Provider {
 				</button>
 
 			</div>
-			<?php
 
-			FormBuilder::display_content_default_screen(
-				\WPForms\Providers\Provider\Status::init( $this->slug )->is_connected( $form_id ),
-				$this->slug,
-				$this->name,
-				$this->icon
-			);
-
-			?>
 			<div class="wpforms-provider-connections-wrap wpforms-clear">
 
 				<div class="wpforms-provider-connections">
