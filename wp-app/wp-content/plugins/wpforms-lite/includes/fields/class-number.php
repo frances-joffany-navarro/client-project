@@ -59,10 +59,9 @@ class WPForms_Field_Number extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$args = [
+		$args = array(
 			'markup' => 'open',
-		];
-
+		);
 		$this->field_option( 'advanced-options', $field, $args );
 
 		// Size.
@@ -71,20 +70,19 @@ class WPForms_Field_Number extends WPForms_Field {
 		// Placeholder.
 		$this->field_option( 'placeholder', $field );
 
+		// Hide label.
+		$this->field_option( 'label_hide', $field );
+
 		// Default value.
 		$this->field_option( 'default_value', $field );
 
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
 
-		// Hide label.
-		$this->field_option( 'label_hide', $field );
-
 		// Options close markup.
-		$args = [
+		$args = array(
 			'markup' => 'close',
-		];
-
+		);
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 
@@ -104,7 +102,7 @@ class WPForms_Field_Number extends WPForms_Field {
 		$this->field_preview_option( 'label', $field );
 
 		// Primary input.
-		echo '<input type="text" placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" readonly>';
+		echo '<input type="text" placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" disabled>';
 
 		// Description.
 		$this->field_preview_option( 'description', $field );

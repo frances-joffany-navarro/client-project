@@ -477,7 +477,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 					$( helper.tooltip ).addClass( 'wpforms-challenge-tooltip-step' + step );
 
 					// Custom positioning.
-					if ( step === 4 || step === 3 ) {
+					if ( step === 4 ) {
 						instance.option( 'side', 'right' );
 					}
 

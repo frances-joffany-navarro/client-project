@@ -63,7 +63,7 @@ class Geolocation extends AddonsItemBase {
 
 		$row_args            = $this->get_address_autocomplete_row_attributes( $addon );
 		$row_args['content'] = $instance->field_element(
-			'toggle',
+			'checkbox',
 			$field,
 			$this->get_address_autocomplete_field_attributes( $field, $addon ),
 			false
@@ -160,8 +160,9 @@ class Geolocation extends AddonsItemBase {
 		return wp_parse_args(
 			[
 				'desc'  => sprintf(
-					'%s<span class="wpforms-field-option-education-pro-badge">pro</span>',
-					esc_html__( 'Enable Address Autocomplete', 'wpforms-lite' )
+					'%s<img class="wpforms-field-option-education-pro-badge" src="%s">',
+					esc_html__( 'Enable Address Autocomplete', 'wpforms-lite' ),
+					esc_url( WPFORMS_PLUGIN_URL . 'assets/images/lite-settings-access/pro-plus.svg' )
 				),
 				'attrs' => [
 					'disabled' => 'disabled',

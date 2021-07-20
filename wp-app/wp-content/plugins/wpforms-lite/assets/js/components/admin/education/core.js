@@ -68,10 +68,6 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 						section: $this.data( 'section' ),
 					};
 
-				if ( $cont.hasClass( 'wpforms-dismiss-out' ) ) {
-					$out = $cont;
-				}
-
 				if ( $out.length > 0 ) {
 					$out.addClass( 'out' );
 					setTimeout(
